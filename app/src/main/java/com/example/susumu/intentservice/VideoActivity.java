@@ -17,6 +17,9 @@ import android.widget.VideoView;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static android.R.drawable.ic_media_pause;
+import static android.R.drawable.ic_media_play;
+
 public class VideoActivity extends AppCompatActivity {
 
     public VideoView video;
@@ -50,8 +53,6 @@ public class VideoActivity extends AppCompatActivity {
             androidId = parameters.getString("name");
             uri = Uri.parse(parameters.getString("source"));
             buttonClickListener();
-            //uri = Uri.parse(intent.getExtras().getString("source"));
-            //Log.d("URL", intent.getExtras().getString("source"));
             VideoChange(uri);
 
         //再生時間表示に関する処理
@@ -64,6 +65,7 @@ public class VideoActivity extends AppCompatActivity {
                         public void run() {
                             counter.setText(String.valueOf(video.getCurrentPosition() / 1000) + "s");
                             seekBar.setProgress(100 * video.getCurrentPosition() / video.getDuration());
+                            seekBar.setSecondaryProgress(100 * video.getBufferPercentage());
                         }
                     });
                 }
@@ -91,7 +93,7 @@ public class VideoActivity extends AppCompatActivity {
                         int i;
                         if (video.isPlaying()) i = 1;
                         else i = 0;
-                        post = new AsyncHttp(e.getX() / v.getWidth(), e.getY() / v.getHeight(), video.getCurrentPosition(), uri.getPath().toString().split("/")[1], androidId, i);
+                        post = new AsyncHttp(e.getX() / v.getWidth(), e.getY() / v.getHeight(), video.getCurrentPosition(), uri.getPath().split("/")[1], androidId, i);
                         post.execute();
                         Log.d("post","post.execute()");
                     }
@@ -128,8 +130,10 @@ public class VideoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (video.isPlaying()) {
                     video.pause();
+                    b_start.setImageResource(ic_media_play);
                 } else {
                     video.start();
+                    b_start.setImageResource(ic_media_pause);
                 }
             }
         });
@@ -141,6 +145,7 @@ public class VideoActivity extends AppCompatActivity {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 video.start();
+                b_start.setImageResource(ic_media_pause);
             }
         });
         return 0;
